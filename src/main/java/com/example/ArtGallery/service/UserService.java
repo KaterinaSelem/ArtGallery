@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,36 +18,6 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-
-
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll();
-//    }
-//
-//    public Optional<User> getUserById(Long id) {
-//        return userRepository.findById(id);
-//    }
-//
-//    public User createUser(User user) {
-//        return userRepository.save(user);
-//    }
-//
-//    public User updateUser(Long id, User userDetails) {
-//        User user = userRepository.findById(id).orElseThrow();
-//        user.setName(userDetails.getName());
-//        user.setEmail(userDetails.getEmail());
-//        user.setPassword(userDetails.getPassword());
-//        user.setUserRole(userDetails.getUserRole());
-//        return userRepository.save(user);
-//    }
-//
-//    @Transactional
-//    public Optional<User> deleteUser(Long id) {
-//        Optional<User> user = userRepository.findById(id);
-//        user.ifPresent(userRepository::delete);
-//        return user;
-//    }
 
     @Autowired
     private RoleRepository roleRepository;
@@ -79,6 +48,11 @@ public class UserService {
                     existingUser.setPassword(userDTO.getPassword());
                     Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
                     existingUser.setUserRole(role);
+                    existingUser.setBornCity(userDTO.getBornCity());
+                    existingUser.setLiveCity(userDTO.getLiveCity());
+                    existingUser.setExhibitions(userDTO.getExhibitions());
+                    existingUser.setDescription(userDTO.getDescription());
+                    existingUser.setImage(userDTO.getImage());
                     User updatedUser = userRepository.save(existingUser);
                     return convertToDTO(updatedUser);
                 })
@@ -90,21 +64,7 @@ public class UserService {
         return userRepository.findById(id)
                 .map(user -> {
                     userRepository.deleteById(id);
-                    return new UserDTO(
-                                                user.getId(),
-                                                user.getName(),
-                                                user.getEmail(),
-                                                user.getPassword(),
-                            new RoleDTO(
-                                                        user.getUserRole().getId(),
-                                                        user.getUserRole().getTitle()
-                                                ),
-                                                user.getLive_city(),
-                                                user.getDescription(),
-                                                user.getExhibitions(),
-                                                user.getImage(),
-                            user.getBorn_city()
-                                        );
+                    return convertToDTO(user);
                 })
                 .orElse(null);
     }
@@ -113,18 +73,20 @@ public class UserService {
         Role defaultRole = roleRepository.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
 
-        // Создаем нового пользователя и присваиваем ему роль по умолчанию
         User newUser = new User();
         newUser.setName(userDTO.getName());
         newUser.setEmail(userDTO.getEmail());
         newUser.setPassword(userDTO.getPassword());
         newUser.setUserRole(defaultRole);
+        newUser.setBornCity(userDTO.getBornCity());
+        newUser.setLiveCity(userDTO.getLiveCity());
+        newUser.setExhibitions(userDTO.getExhibitions());
+        newUser.setDescription(userDTO.getDescription());
+        newUser.setImage(userDTO.getImage());
 
-        // Сохраняем пользователя в базе данных
         User savedUser = userRepository.save(newUser);
         return convertToDTO(savedUser);
     }
-
 
     private UserDTO convertToDTO(User user) {
         UserDTO userDTO = new UserDTO();
@@ -135,6 +97,11 @@ public class UserService {
         if (user.getUserRole() != null) {
             userDTO.setUserRole(new RoleDTO(user.getUserRole().getId(), user.getUserRole().getTitle()));
         }
+        userDTO.setBornCity(user.getBornCity());
+        userDTO.setLiveCity(user.getLiveCity());
+        userDTO.setExhibitions(user.getExhibitions());
+        userDTO.setDescription(user.getDescription());
+        userDTO.setImage(user.getImage());
         return userDTO;
     }
 
@@ -148,6 +115,11 @@ public class UserService {
             Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
             user.setUserRole(role);
         }
+        user.setBornCity(userDTO.getBornCity());
+        user.setLiveCity(userDTO.getLiveCity());
+        user.setExhibitions(userDTO.getExhibitions());
+        user.setDescription(userDTO.getDescription());
+        user.setImage(userDTO.getImage());
         return user;
     }
 }

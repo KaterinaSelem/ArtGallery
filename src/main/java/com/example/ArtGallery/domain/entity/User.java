@@ -42,13 +42,15 @@ public class User {
     private Role userRole;
 
     @Column(name = "born")
-    private String born_city;
+    private String bornСity;
 
     @Column(name = "live")
-    private String live_city;
+    private String liveCity;
 
     @Column(name = "exhibitions")
-    private List<String> exhibitions = new ArrayList<>();;
+    @ElementCollection
+    private List<String> exhibitions = new ArrayList<>();
+    ;
 
     @Column(name = "description")
     private String description;
@@ -113,20 +115,20 @@ public class User {
         this.userRole = userRole;
     }
 
-    public String getBorn_city() {
-        return born_city;
+    public String getBornСity() {
+        return bornСity;
     }
 
-    public void setBorn_city(String born_city) {
-        this.born_city = born_city;
+    public void setBornСity(String bornСity) {
+        this.bornСity = bornСity;
     }
 
-    public String getLive_city() {
-        return live_city;
+    public String getLiveCity() {
+        return liveCity;
     }
 
-    public void setLive_city(String live_city) {
-        this.live_city = live_city;
+    public void setLiveCity(String liveCity) {
+        this.liveCity = liveCity;
     }
 
     public List<String> getExhibitions() {
@@ -134,7 +136,7 @@ public class User {
     }
 
     public void setExhibitions(List<String> exhibitions) {
-        this.exhibitions = new ArrayList<>();
+        this.exhibitions = exhibitions;
     }
 
     public String getDescription() {
@@ -158,11 +160,35 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(userRole, user.userRole) && Objects.equals(born_city, user.born_city) && Objects.equals(live_city, user.live_city) && Objects.equals(exhibitions, user.exhibitions) && Objects.equals(description, user.description) && Objects.equals(image, user.image);
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(userRole, user.userRole) && Objects.equals(bornСity, user.bornСity) && Objects.equals(liveCity, user.liveCity) && Objects.equals(exhibitions, user.exhibitions) && Objects.equals(description, user.description) && Objects.equals(image, user.image);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, userRole, born_city, live_city, exhibitions, description, image);
+        return Objects.hash(id, name, email, password, userRole, bornСity, liveCity, exhibitions, description, image);
+    }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", userRole=" + userRole +
+                ", bornСity='" + bornСity + '\'' +
+                ", liveCity='" + liveCity + '\'' +
+                ", exhibitions=" + exhibitions +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                '}';
+    }
+
+
+    public void setBornCity(String bornCity) {
+    }
+
+    public String getBornCity() {
+        return bornСity;
     }
 }
+
