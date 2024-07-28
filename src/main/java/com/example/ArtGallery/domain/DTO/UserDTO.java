@@ -17,9 +17,9 @@ public class UserDTO {
     private String email;
     private String password;
     private RoleDTO userRole;
-    private String bornCity;  // Исправлено с bornСity
-    private String liveCity;  // Исправлено с liveСity
-    private List<String> exhibitions;  // Исправлено с exhibition
+    private String bornCity;
+    private String liveCity;
+    private List<String> exhibitions;
     private String description;
     private String image;
 
