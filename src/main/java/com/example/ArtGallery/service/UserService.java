@@ -2,6 +2,7 @@ package com.example.ArtGallery.service;
 
 import com.example.ArtGallery.domain.DTO.RoleDTO;
 import com.example.ArtGallery.domain.DTO.UserDTO;
+import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
 import com.example.ArtGallery.domain.entity.Role;
 import com.example.ArtGallery.domain.entity.User;
 import com.example.ArtGallery.repositories.RoleRepository;
@@ -86,11 +87,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO deleteUser(Long id) {
+    public UserDeleteDTO deleteUser(Long id) {
         return userRepository.findById(id)
                 .map(user -> {
                     userRepository.deleteById(id);
-                    return new UserDTO(
+                    return new UserDeleteDTO(
                             user.getId(),
                             user.getName(),
                             user.getEmail(),
@@ -115,6 +116,12 @@ public class UserService {
         newUser.setPassword(userDTO.getPassword());
         newUser.setUserRole(defaultRole);
 
+        // Присваиваем значения дополнительных полей
+        newUser.setBornСity(userDTO.getBornCity());
+        newUser.setLiveCity(userDTO.getLiveCity()); //
+        newUser.setDescription(userDTO.getDescription());
+        newUser.setImage(userDTO.getImage());
+
         // Сохраняем пользователя в базе данных
         User savedUser = userRepository.save(newUser);
         return convertToDTO(savedUser);
@@ -127,6 +134,12 @@ public class UserService {
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPassword(user.getPassword());
+
+        userDTO.setBornCity(user.getBornСity());
+        userDTO.setLiveCity(user.getLiveCity());
+        userDTO.setDescription(user.getDescription());
+        userDTO.setImage(user.getImage());
+
         if (user.getUserRole() != null) {
             userDTO.setUserRole(new RoleDTO(user.getUserRole().getId(), user.getUserRole().getTitle()));
         }
@@ -139,6 +152,12 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
+
+        user.setBornСity(userDTO.getBornCity());
+        user.setLiveCity(userDTO.getLiveCity());
+        user.setDescription(userDTO.getDescription());
+        user.setImage(userDTO.getImage());
+
         if (userDTO.getUserRole() != null) {
             Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
             user.setUserRole(role);

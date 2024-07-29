@@ -24,6 +24,21 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="bornCity" type="varchar(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="liveCity" type="varchar(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="image" type="text">
+                <constraints nullable="true"/>
+            </column>
+
+
+
         </createTable>
 
 

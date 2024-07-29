@@ -19,6 +19,7 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "name")
     private String name;
 
     @Column(name = "email")
@@ -26,6 +27,18 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "bornCity")
+    private String bornСity;
+
+    @Column(name = "liveCity")
+    private String liveCity;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "image")
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

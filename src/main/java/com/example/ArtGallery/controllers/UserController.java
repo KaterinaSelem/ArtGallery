@@ -1,6 +1,7 @@
 package com.example.ArtGallery.controllers;
 
 import com.example.ArtGallery.domain.DTO.UserDTO;
+import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
 import com.example.ArtGallery.domain.entity.User;
 import com.example.ArtGallery.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public UserDTO deleteUser(@PathVariable Long id) {
+    public UserDeleteDTO deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
 

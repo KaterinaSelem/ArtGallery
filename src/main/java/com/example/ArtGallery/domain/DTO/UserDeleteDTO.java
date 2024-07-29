@@ -1,6 +1,5 @@
 package com.example.ArtGallery.domain.DTO;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,15 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDeleteDTO {
 
     private Long id;
     private String name;
     private String email;
     private String password;
     private RoleDTO userRole;
-    private String bornCity;
-    private String liveCity;
-    private String description;
-    private String image;
 }
