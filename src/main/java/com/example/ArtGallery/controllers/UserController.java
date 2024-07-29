@@ -1,5 +1,6 @@
 package com.example.ArtGallery.controllers;
 
+import com.example.ArtGallery.domain.DTO.RegisterDTO;
 import com.example.ArtGallery.domain.DTO.UserDTO;
 import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
 import com.example.ArtGallery.domain.entity.User;
@@ -81,10 +82,25 @@ public class UserController {
 
 
 
+//    @PostMapping("/register")
+//    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
+//        UserDTO createdUser = userService.registerUser(userDTO);
+//        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+//    }
+
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.registerUser(userDTO);
+    public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterDTO registerDTO) {
+        UserDTO createdUser = userService.registerUser(registerDTO);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/updateFields")
+    public ResponseEntity<UserDTO> updateUserFields(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        UserDTO updatedUser = userService.updateUserFields(id, userDTO);
+        if (updatedUser == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.ArtGallery.service;
 
+import com.example.ArtGallery.domain.DTO.RegisterDTO;
 import com.example.ArtGallery.domain.DTO.RoleDTO;
 import com.example.ArtGallery.domain.DTO.UserDTO;
 import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
@@ -105,26 +106,55 @@ public class UserService {
                 .orElse(null);
     }
 
-    public UserDTO registerUser(UserDTO userDTO) {
+//    public UserDTO registerUser(UserDTO userDTO) {
+//        Role defaultRole = roleRepository.findById(2L)
+//                .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
+//
+//        // Создаем нового пользователя и присваиваем ему роль по умолчанию
+//        User newUser = new User();
+//        newUser.setName(userDTO.getName());
+//        newUser.setEmail(userDTO.getEmail());
+//        newUser.setPassword(userDTO.getPassword());
+//        newUser.setUserRole(defaultRole);
+//
+//        // Присваиваем значения дополнительных полей
+//        newUser.setBornСity(userDTO.getBornCity());
+//        newUser.setLiveCity(userDTO.getLiveCity()); //
+//        newUser.setDescription(userDTO.getDescription());
+//        newUser.setImage(userDTO.getImage());
+//
+//        // Сохраняем пользователя в базе данных
+//        User savedUser = userRepository.save(newUser);
+//        return convertToDTO(savedUser);
+//    }
+
+    public UserDTO registerUser(RegisterDTO registerDTO) {
         Role defaultRole = roleRepository.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
 
         // Создаем нового пользователя и присваиваем ему роль по умолчанию
         User newUser = new User();
-        newUser.setName(userDTO.getName());
-        newUser.setEmail(userDTO.getEmail());
-        newUser.setPassword(userDTO.getPassword());
+        newUser.setName(registerDTO.getName());
+        newUser.setEmail(registerDTO.getEmail());
+        newUser.setPassword(registerDTO.getPassword());
         newUser.setUserRole(defaultRole);
-
-        // Присваиваем значения дополнительных полей
-        newUser.setBornСity(userDTO.getBornCity());
-        newUser.setLiveCity(userDTO.getLiveCity()); //
-        newUser.setDescription(userDTO.getDescription());
-        newUser.setImage(userDTO.getImage());
 
         // Сохраняем пользователя в базе данных
         User savedUser = userRepository.save(newUser);
         return convertToDTO(savedUser);
+    }
+
+    public UserDTO updateUserFields(Long id, UserDTO userDTO) {
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    existingUser.setBornСity(userDTO.getBornCity());
+                    existingUser.setLiveCity(userDTO.getLiveCity());
+                    existingUser.setDescription(userDTO.getDescription());
+                    existingUser.setImage(userDTO.getImage());
+                    User updatedUser = userRepository.save(existingUser);
+                    return convertToDTO(updatedUser);
+                })
+                .orElse(null);
     }
 
 
