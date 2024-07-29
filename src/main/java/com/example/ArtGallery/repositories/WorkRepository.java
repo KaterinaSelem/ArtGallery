@@ -1,11 +1,11 @@
 package com.example.ArtGallery.repositories;
 
 
-import com.example.ArtGallery.domain.entity.User;
+import com.example.ArtGallery.domain.entity.Work;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface WorkRepository extends JpaRepository<Work, Long> {
 
 }

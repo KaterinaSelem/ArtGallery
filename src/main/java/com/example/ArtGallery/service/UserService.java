@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +80,7 @@ public class UserService {
                     existingUser.setPassword(userDTO.getPassword());
                     Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
                     existingUser.setUserRole(role);
-                    existingUser.setBornСity(userDTO.getBornCity());
+                    existingUser.setBornCity(userDTO.getBornCity());
                     existingUser.setLiveCity(userDTO.getLiveCity());
                     existingUser.setDescription(userDTO.getDescription());
                     existingUser.setImage(userDTO.getImage());
@@ -168,7 +167,7 @@ public class UserService {
     public UserDTO updateUserFields(Long id, UserDTO userDTO) {
         return userRepository.findById(id)
                 .map(existingUser -> {
-                    existingUser.setBornСity(userDTO.getBornCity());
+                    existingUser.setBornCity(userDTO.getBornCity());
                     existingUser.setLiveCity(userDTO.getLiveCity());
                     existingUser.setDescription(userDTO.getDescription());
                     existingUser.setImage(userDTO.getImage());
@@ -186,7 +185,7 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setPassword(user.getPassword());
 
-        userDTO.setBornCity(user.getBornСity());
+        userDTO.setBornCity(user.getBornCity());
         userDTO.setLiveCity(user.getLiveCity());
         userDTO.setDescription(user.getDescription());
         userDTO.setImage(user.getImage());
@@ -204,7 +203,7 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
 
-        user.setBornСity(userDTO.getBornCity());
+        user.setBornCity(userDTO.getBornCity());
         user.setLiveCity(userDTO.getLiveCity());
         user.setDescription(userDTO.getDescription());
         user.setImage(userDTO.getImage());

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -29,7 +31,7 @@ public class User {
     private String password;
 
     @Column(name = "bornCity")
-    private String bornСity;
+    private String bornCity;
 
     @Column(name = "liveCity")
     private String liveCity;
@@ -44,4 +46,7 @@ public class User {
     @JoinColumn(name = "role_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Role userRole;
+
+    @OneToMany(mappedBy = "user")
+    private List<Work> works;
 }
