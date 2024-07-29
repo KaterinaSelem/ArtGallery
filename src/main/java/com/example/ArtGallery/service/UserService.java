@@ -81,6 +81,10 @@ public class UserService {
                     existingUser.setPassword(userDTO.getPassword());
                     Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
                     existingUser.setUserRole(role);
+                    existingUser.setBornСity(userDTO.getBornCity());
+                    existingUser.setLiveCity(userDTO.getLiveCity());
+                    existingUser.setDescription(userDTO.getDescription());
+                    existingUser.setImage(userDTO.getImage());
                     User updatedUser = userRepository.save(existingUser);
                     return convertToDTO(updatedUser);
                 })
@@ -128,16 +132,33 @@ public class UserService {
 //        return convertToDTO(savedUser);
 //    }
 
-    public UserDTO registerUser(RegisterDTO registerDTO) {
-        Role defaultRole = roleRepository.findById(2L)
-                .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
+//    public UserDTO registerUser(RegisterDTO registerDTO) {
+//        Role defaultRole = roleRepository.findById(2L)
+//                .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
+//
+//        // Создаем нового пользователя и присваиваем ему роль по умолчанию
+//        User newUser = new User();
+//        newUser.setName(registerDTO.getName());
+//        newUser.setEmail(registerDTO.getEmail());
+//        newUser.setPassword(registerDTO.getPassword());
+//        newUser.setUserRole(defaultRole);
+//
+//        // Сохраняем пользователя в базе данных
+//        User savedUser = userRepository.save(newUser);
+//        return convertToDTO(savedUser);
+//    }
 
-        // Создаем нового пользователя и присваиваем ему роль по умолчанию
+    public UserDTO registerUser(RegisterDTO registerDTO) {
+        // Получаем роль по идентификатору
+        Role selectedRole = roleRepository.findById(registerDTO.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        // Создаем нового пользователя и присваиваем ему выбранную роль
         User newUser = new User();
         newUser.setName(registerDTO.getName());
         newUser.setEmail(registerDTO.getEmail());
         newUser.setPassword(registerDTO.getPassword());
-        newUser.setUserRole(defaultRole);
+        newUser.setUserRole(selectedRole);
 
         // Сохраняем пользователя в базе данных
         User savedUser = userRepository.save(newUser);
