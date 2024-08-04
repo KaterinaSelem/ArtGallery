@@ -16,7 +16,7 @@ public class WorkController {
     @Autowired
     private WorkService workService;
 
-    @GetMapping
+    @GetMapping ("/all")
     public ResponseEntity<List<WorkDTO>> getAllWorks() {
         List<WorkDTO> works = workService.getAllWorks();
         return new ResponseEntity<>(works, HttpStatus.OK);

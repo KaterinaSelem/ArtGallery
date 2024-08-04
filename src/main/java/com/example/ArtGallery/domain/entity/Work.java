@@ -1,6 +1,6 @@
 package com.example.ArtGallery.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,8 @@ public class Work {
     private String title;
 
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date createdAt;
 
     @Column(name = "category_id")
@@ -44,5 +45,6 @@ public class Work {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
+//    @JsonBackReference
     private User user;
 }

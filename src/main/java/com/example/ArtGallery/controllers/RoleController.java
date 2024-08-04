@@ -1,22 +1,20 @@
 package com.example.ArtGallery.controllers;
 
 import com.example.ArtGallery.domain.DTO.RoleDTO;
-import com.example.ArtGallery.domain.entity.Role;
-import com.example.ArtGallery.service.RoleService;
+import com.example.ArtGallery.service.RoleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {
 
     @Autowired
-    private RoleService roleService;
+    private RoleServiceImpl roleService;
 
 //    @GetMapping
 //    public List<Role> getAllRoles() {

@@ -8,72 +8,66 @@ import com.example.ArtGallery.domain.entity.Role;
 import com.example.ArtGallery.domain.entity.User;
 import com.example.ArtGallery.repositories.RoleRepository;
 import com.example.ArtGallery.repositories.UserRepository;
+import com.example.ArtGallery.service.interfaces.EmailService;
+import com.example.ArtGallery.service.interfaces.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository repository;
+    private final BCryptPasswordEncoder encoder;
+    private final RoleServiceImpl roleService;
+    private final EmailService emailService;
 
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder, RoleServiceImpl roleService, EmailService emailService) {
+        this.repository = userRepository;
+        this.encoder = encoder;
+        this.roleService = roleService;
+        this.emailService = emailService;
+    }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll();
-//    }
-//
-//    public Optional<User> getUserById(Long id) {
-//        return userRepository.findById(id);
-//    }
-//
-//    public User createUser(User user) {
-//        return userRepository.save(user);
-//    }
-//
-//    public User updateUser(Long id, User userDetails) {
-//        User user = userRepository.findById(id).orElseThrow();
-//        user.setName(userDetails.getName());
-//        user.setEmail(userDetails.getEmail());
-//        user.setPassword(userDetails.getPassword());
-//        user.setUserRole(userDetails.getUserRole());
-//        return userRepository.save(user);
-//    }
-//
-//    @Transactional
-//    public Optional<User> deleteUser(Long id) {
-//        Optional<User> user = userRepository.findById(id);
-//        user.ifPresent(userRepository::delete);
-//        return user;
-//    }
+        return repository.findByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException(
+                        String.format("User %s not found", username)));
+    }
 
     @Autowired
     private RoleRepository roleRepository;
 
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
+        return repository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public UserDTO getUserById(Long id) {
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .map(this::convertToDTO)
                 .orElse(null);
     }
 
     public UserDTO createUser(UserDTO userDTO) {
         User user = convertToEntity(userDTO);
-        User savedUser = userRepository.save(user);
+        User savedUser = repository.save(user);
         return convertToDTO(savedUser);
     }
 
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .map(existingUser -> {
                     existingUser.setName(userDTO.getName());
                     existingUser.setEmail(userDTO.getEmail());
@@ -84,7 +78,7 @@ public class UserService {
                     existingUser.setLiveCity(userDTO.getLiveCity());
                     existingUser.setDescription(userDTO.getDescription());
                     existingUser.setImage(userDTO.getImage());
-                    User updatedUser = userRepository.save(existingUser);
+                    User updatedUser = repository.save(existingUser);
                     return convertToDTO(updatedUser);
                 })
                 .orElse(null);
@@ -92,9 +86,9 @@ public class UserService {
 
     @Transactional
     public UserDeleteDTO deleteUser(Long id) {
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .map(user -> {
-                    userRepository.deleteById(id);
+                    repository.deleteById(id);
                     return new UserDeleteDTO(
                             user.getId(),
                             user.getName(),
@@ -109,44 +103,6 @@ public class UserService {
                 .orElse(null);
     }
 
-//    public UserDTO registerUser(UserDTO userDTO) {
-//        Role defaultRole = roleRepository.findById(2L)
-//                .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
-//
-//        // Создаем нового пользователя и присваиваем ему роль по умолчанию
-//        User newUser = new User();
-//        newUser.setName(userDTO.getName());
-//        newUser.setEmail(userDTO.getEmail());
-//        newUser.setPassword(userDTO.getPassword());
-//        newUser.setUserRole(defaultRole);
-//
-//        // Присваиваем значения дополнительных полей
-//        newUser.setBornСity(userDTO.getBornCity());
-//        newUser.setLiveCity(userDTO.getLiveCity()); //
-//        newUser.setDescription(userDTO.getDescription());
-//        newUser.setImage(userDTO.getImage());
-//
-//        // Сохраняем пользователя в базе данных
-//        User savedUser = userRepository.save(newUser);
-//        return convertToDTO(savedUser);
-//    }
-
-//    public UserDTO registerUser(RegisterDTO registerDTO) {
-//        Role defaultRole = roleRepository.findById(2L)
-//                .orElseThrow(() -> new RuntimeException("Role with ID 2 not found"));
-//
-//        // Создаем нового пользователя и присваиваем ему роль по умолчанию
-//        User newUser = new User();
-//        newUser.setName(registerDTO.getName());
-//        newUser.setEmail(registerDTO.getEmail());
-//        newUser.setPassword(registerDTO.getPassword());
-//        newUser.setUserRole(defaultRole);
-//
-//        // Сохраняем пользователя в базе данных
-//        User savedUser = userRepository.save(newUser);
-//        return convertToDTO(savedUser);
-//    }
-
     public UserDTO registerUser(RegisterDTO registerDTO) {
         // Получаем роль по идентификатору
         Role selectedRole = roleRepository.findById(registerDTO.getRoleId())
@@ -160,18 +116,18 @@ public class UserService {
         newUser.setUserRole(selectedRole);
 
         // Сохраняем пользователя в базе данных
-        User savedUser = userRepository.save(newUser);
+        User savedUser = repository.save(newUser);
         return convertToDTO(savedUser);
     }
 
     public UserDTO updateUserFields(Long id, UserDTO userDTO) {
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .map(existingUser -> {
                     existingUser.setBornCity(userDTO.getBornCity());
                     existingUser.setLiveCity(userDTO.getLiveCity());
                     existingUser.setDescription(userDTO.getDescription());
                     existingUser.setImage(userDTO.getImage());
-                    User updatedUser = userRepository.save(existingUser);
+                    User updatedUser = repository.save(existingUser);
                     return convertToDTO(updatedUser);
                 })
                 .orElse(null);
@@ -213,5 +169,17 @@ public class UserService {
             user.setUserRole(role);
         }
         return user;
+    }
+
+
+    @Override
+    public void register(User user) {
+        user.setId(null);
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setActive(false);
+        user.setRoles(Set.of(roleService.getRoleUser()));
+
+        repository.save(user);
+        emailService.sendConfirmationEmail(user);
     }
 }

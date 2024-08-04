@@ -12,7 +12,7 @@
             <column name="title" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="created_at" type="timestamp">
+            <column name="created_at" type="date">
                 <constraints nullable="true"/>
             </column>
             <column name="category_id" type="int">

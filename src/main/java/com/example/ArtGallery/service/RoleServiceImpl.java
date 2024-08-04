@@ -3,73 +3,55 @@ package com.example.ArtGallery.service;
 import com.example.ArtGallery.domain.DTO.RoleDTO;
 import com.example.ArtGallery.domain.entity.Role;
 import com.example.ArtGallery.repositories.RoleRepository;
+import com.example.ArtGallery.service.interfaces.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class RoleService {
+public class RoleServiceImpl implements RoleService {
 
     @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository repository;
 
-//    public List<Role> getAllRoles() {
-//        return roleRepository.findAll();
-//    }
-//
-//    public Optional<Role> getRoleById(Long id) {
-//        return roleRepository.findById(id);
-//    }
-//
-//    public Role createRole(Role role) {
-//        return roleRepository.save(role);
-//    }
-//
-//    public Role updateRole(Long id, Role roleDetails) {
-//        Role role = roleRepository.findById(id).orElseThrow();
-//        role.setTitle(roleDetails.getTitle());
-//        return roleRepository.save(role);
-//    }
-//
-//    public void deleteRole(Long id) {
-//        roleRepository.deleteById(id);
-//    }
+    public RoleServiceImpl(RoleRepository roleRepository) {
+        this.repository = roleRepository;
+    }
 
     public List<RoleDTO> getAllRoles() {
-        return roleRepository.findAll().stream()
+        return repository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public RoleDTO getRoleById(Long id) {
-        return roleRepository.findById(id)
+        return repository.findById(id)
                 .map(this::convertToDTO)
                 .orElse(null);
     }
 
     public RoleDTO createRole(RoleDTO roleDTO) {
         Role role = convertToEntity(roleDTO);
-        Role savedRole = roleRepository.save(role);
+        Role savedRole = repository.save(role);
         return convertToDTO(savedRole);
     }
 
     public RoleDTO updateRole(Long id, RoleDTO roleDTO) {
-        return roleRepository.findById(id)
+        return repository.findById(id)
                 .map(existingRole -> {
                     existingRole.setTitle(roleDTO.getTitle());
-                    Role updatedRole = roleRepository.save(existingRole);
+                    Role updatedRole = repository.save(existingRole);
                     return convertToDTO(updatedRole);
                 })
                 .orElse(null);
     }
 
     public RoleDTO deleteRole(Long id) {
-        return roleRepository.findById(id)
+        return repository.findById(id)
                 .map(role -> {
-                    roleRepository.deleteById(id);
+                    repository.deleteById(id);
                     return convertToDTO(role);
                 })
                 .orElse(null);
@@ -87,5 +69,12 @@ public class RoleService {
         role.setId(roleDTO.getId());
         role.setTitle(roleDTO.getTitle());
         return role;
+    }
+
+    @Override
+    public Role getRoleUser() {
+        return repository.findByTitle("USER").orElseThrow(
+                () -> new RuntimeException("Database doesn't contain ROLE_USER")
+        );
     }
 }
