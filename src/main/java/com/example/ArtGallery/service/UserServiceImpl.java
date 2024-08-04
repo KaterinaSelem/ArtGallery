@@ -171,15 +171,32 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+//      Recover 04.08 15:32
+//    @Override
+//    public void register(User user) {
+//        user.setId(null);
+//        user.setPassword(encoder.encode(user.getPassword()));
+//        user.setActive(false);
+//        user.setRoles(Set.of(roleService.getRoleUser()));
+//
+//        repository.save(user);
+//        emailService.sendConfirmationEmail(user);
+//    }
 
     @Override
-    public void register(User user) {
-        user.setId(null);
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setActive(false);
-        user.setRoles(Set.of(roleService.getRoleUser()));
+    public void register(RegisterDTO registerDTO) {
+        Role selectedRole = roleService.getRoleById(registerDTO.getRoleId());
 
-        repository.save(user);
-        emailService.sendConfirmationEmail(user);
+        User newUser = new User();
+        newUser.setName(registerDTO.getName());
+        newUser.setEmail(registerDTO.getEmail());
+        newUser.setPassword(encoder.encode(registerDTO.getPassword()));
+        newUser.setActive(false);
+        newUser.setRoles(Set.of(selectedRole));
+
+        repository.save(newUser);
+        emailService.sendConfirmationEmail(newUser);
     }
+
+
 }

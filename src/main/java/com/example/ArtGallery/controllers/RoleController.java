@@ -47,14 +47,14 @@ public class RoleController {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Long id) {
-        RoleDTO role = roleService.getRoleById(id);
-        if (role != null) {
-            return new ResponseEntity<>(role, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Long id) {
+//        RoleDTO role = roleService.getRoleById(id);
+//        if (role != null) {
+//            return new ResponseEntity<>(role, HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 
     @PostMapping
     public ResponseEntity<RoleDTO> createRole(@RequestBody RoleDTO roleDTO) {

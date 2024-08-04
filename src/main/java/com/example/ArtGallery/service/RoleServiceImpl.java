@@ -26,11 +26,23 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toList());
     }
 
-    public RoleDTO getRoleById(Long id) {
-        return repository.findById(id)
-                .map(this::convertToDTO)
-                .orElse(null);
+    //    public RoleDTO getRoleById(Long id) {
+//        return repository.findById(id)
+//                .map(this::convertToDTO)
+//                .orElse(null);
+//    }
+    @Override
+    public RoleDTO getRoleDTOById(Long roleId) {
+        Role role = getRoleById(roleId);
+        return new RoleDTO(role.getId(), role.getTitle());
     }
+
+    @Override
+    public Role getRoleById(Long roleId) {
+        return repository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+    }
+
 
     public RoleDTO createRole(RoleDTO roleDTO) {
         Role role = convertToEntity(roleDTO);
@@ -77,4 +89,6 @@ public class RoleServiceImpl implements RoleService {
                 () -> new RuntimeException("Database doesn't contain ROLE_USER")
         );
     }
+
+
 }
