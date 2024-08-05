@@ -4,6 +4,7 @@ import com.example.ArtGallery.domain.DTO.RegisterDTO;
 import com.example.ArtGallery.domain.DTO.RoleDTO;
 import com.example.ArtGallery.domain.DTO.UserDTO;
 import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
+import com.example.ArtGallery.domain.entity.ConfirmationCode;
 import com.example.ArtGallery.domain.entity.Role;
 import com.example.ArtGallery.domain.entity.User;
 import com.example.ArtGallery.repositories.RoleRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,20 +31,25 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final RoleServiceImpl roleService;
     private final EmailService emailService;
+    private final ConfirmationServiceImpl confirmationService;
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder, RoleServiceImpl roleService, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder, RoleServiceImpl roleService, EmailService emailService, ConfirmationServiceImpl confirmationService) {
         this.repository = userRepository;
         this.encoder = encoder;
         this.roleService = roleService;
         this.emailService = emailService;
+        this.confirmationService = confirmationService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        return repository.findByEmail(username).orElseThrow(
-                () -> new UsernameNotFoundException(
-                        String.format("User %s not found", username)));
+        User user = repository.findByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("User %s not found", username))
+        );
+        if (!user.getActive()) {
+            throw new UsernameNotFoundException("User is not active");
+        }
+        return user;
     }
 
     @Autowired
@@ -103,22 +110,22 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
-    public UserDTO registerUser(RegisterDTO registerDTO) {
-        // Получаем роль по идентификатору
-        Role selectedRole = roleRepository.findById(registerDTO.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
-        // Создаем нового пользователя и присваиваем ему выбранную роль
-        User newUser = new User();
-        newUser.setName(registerDTO.getName());
-        newUser.setEmail(registerDTO.getEmail());
-        newUser.setPassword(registerDTO.getPassword());
-        newUser.setUserRole(selectedRole);
-
-        // Сохраняем пользователя в базе данных
-        User savedUser = repository.save(newUser);
-        return convertToDTO(savedUser);
-    }
+//    public UserDTO registerUser(RegisterDTO registerDTO) {
+//        // Получаем роль по идентификатору
+//        Role selectedRole = roleRepository.findById(registerDTO.getRoleId())
+//                .orElseThrow(() -> new RuntimeException("Role not found"));
+//
+//        // Создаем нового пользователя и присваиваем ему выбранную роль
+//        User newUser = new User();
+//        newUser.setName(registerDTO.getName());
+//        newUser.setEmail(registerDTO.getEmail());
+//        newUser.setPassword(registerDTO.getPassword());
+//        newUser.setUserRole(selectedRole);
+//
+//        // Сохраняем пользователя в базе данных
+//        User savedUser = repository.save(newUser);
+//        return convertToDTO(savedUser);
+//    }
 
     public UserDTO updateUserFields(Long id, UserDTO userDTO) {
         return repository.findById(id)
@@ -198,5 +205,57 @@ public class UserServiceImpl implements UserService {
         emailService.sendConfirmationEmail(newUser);
     }
 
+    //    @Transactional
+//    public boolean activateUser(String code) {
+//        ConfirmationCode confirmationCode = confirmationService.getConfirmationCode(code);
+//
+//        if (confirmationCode == null || confirmationCode.getExpired().isBefore(LocalDateTime.now())) {
+//            return false; // Код не найден или истёк срок действия
+//        }
+//
+//        User user = confirmationCode.getUser();
+//        user.setActive(true);
+//        repository.save(user);
+//
+//        confirmationService.deleteConfirmationCode(confirmationCode); // Удаляем использованный код
+//
+//        return true;
+//    }
+    @Transactional
+    public boolean activateUser(String code) {
+        // Получаем код подтверждения
+        ConfirmationCode confirmationCode = confirmationService.getConfirmationCode(code);
+
+        // Проверяем, существует ли код и не истек ли его срок действия
+        if (confirmationCode == null) {
+            return false; // Код не найден
+        }
+
+        // Получаем пользователя, связанного с кодом
+        User user = confirmationCode.getUser();
+
+        // Если код истек
+        if (confirmationCode.getExpired().isBefore(LocalDateTime.now())) {
+            // Удаляем код подтверждения
+            confirmationService.deleteConfirmationCode(confirmationCode);
+
+            // Если пользователь существует, удаляем его
+            if (user != null) {
+                repository.delete(user);
+            }
+
+            return false; // Код истек
+        }
+
+        // Активируем пользователя
+
+        user.setActive(true);
+        repository.save(user);
+
+        // Удаляем использованный код подтверждения
+        confirmationService.deleteConfirmationCode(confirmationCode);
+
+        return true;
+    }
 
 }

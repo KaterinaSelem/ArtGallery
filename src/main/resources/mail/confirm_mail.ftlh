@@ -7,6 +7,6 @@
 <body>
 <h1 style="color: green">Registration Confirmation</h1>
 <h2>Hello, ${name}!</h2>
-<p>To confirm your registration, please follow <a href="${link}">ссылке</a></p>
+<p>To confirm your registration, please follow <a href="${link}">link</a></p>
 </body>
 </html>

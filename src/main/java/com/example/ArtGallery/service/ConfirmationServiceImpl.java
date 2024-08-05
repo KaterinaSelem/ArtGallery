@@ -21,9 +21,19 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     @Override
     public String generateConfirmationCode(User user) {
         String code = UUID.randomUUID().toString();
-        LocalDateTime expired = LocalDateTime.now().plusMinutes(60);
+        LocalDateTime expired = LocalDateTime.now().plusMinutes(1);
         ConfirmationCode confirmationCode = new ConfirmationCode(code, expired, user);
         repository.save(confirmationCode);
         return code;
+    }
+
+    @Override
+    public ConfirmationCode getConfirmationCode(String code) {
+        return repository.findByCode(code).orElse(null);
+    }
+
+    @Override
+    public void deleteConfirmationCode(ConfirmationCode confirmationCode) {
+        repository.delete(confirmationCode);
     }
 }
