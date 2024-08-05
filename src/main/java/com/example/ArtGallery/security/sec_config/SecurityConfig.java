@@ -38,13 +38,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x -> x
+
+//                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/register").permitAll()
+//                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST")
 //                        .requestMatchers(HttpMethod.GET, "/api/works").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/api/works").hasAnyRole("ADMIN", "USER")
 //                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST")
-//                                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
-//                                .requestMatchers(HttpMethod.POST, "/register").permitAll()
-                                    .anyRequest().permitAll()
+                        .anyRequest().permitAll()
                 )
                 .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
