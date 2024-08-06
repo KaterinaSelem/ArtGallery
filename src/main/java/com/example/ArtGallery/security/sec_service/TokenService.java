@@ -45,6 +45,7 @@ public class TokenService {
                 .signWith(accessKey)
                 .claim("roles", user.getAuthorities())
                 .claim("name", user.getUsername())
+                .claim("active", user.getActive())
                 .compact();
     }
 
@@ -119,6 +120,7 @@ public class TokenService {
             }
         }
 
-        return new AuthInfo(username, roles);
+        boolean active = claims.get("active", Boolean.class); // Извлекаем статус активности
+        return new AuthInfo(username, roles, active);
     }
 }

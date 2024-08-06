@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,5 +15,5 @@ public class UserDeleteDTO {
     private String name;
     private String email;
     private String password;
-    private RoleDTO userRole;
+    private Set<RoleDTO> roles;
 }

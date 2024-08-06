@@ -12,10 +12,12 @@ public class AuthInfo implements Authentication {
     private boolean authenticated;
     private String username;
     private Set<Role> roles;
+    private boolean active;
 
-    public AuthInfo(String username, Set<Role> roles) {
+    public AuthInfo(String username, Set<Role> roles, boolean active) {
         this.username = username;
         this.roles = roles;
+        this.active = active;
     }
 
     @Override
@@ -51,5 +53,13 @@ public class AuthInfo implements Authentication {
     @Override
     public String getName() {
         return username;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -21,8 +21,24 @@ public class RegistrationController {
 
     @PostMapping
     public Response register(@RequestBody RegisterDTO registerDTO) {
-        service.register(registerDTO);
-        return new Response("Registration complete. You have been sent an email with a confirmation link. " +
-                "The link will be valid for 1 hour. Please check your email.");
+        try {
+            service.register(registerDTO);
+            return new Response("Registration complete. You have been sent an email with a confirmation link. " +
+                    "The link will be valid for 1 hour. Please check your email.");
+        } catch (RuntimeException e) {
+            return new Response("Registration failed: " + e.getMessage());
+        }
+    }
+
+    private static class Response {
+        private final String message;
+
+        public Response(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

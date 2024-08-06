@@ -40,11 +40,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(x -> x
 
 //                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/register").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/register").permitAll() // Разрешить доступ к регистрации
+//                        .requestMatchers(HttpMethod.GET, "/activate").permitAll() // Разрешить доступ к активации
 //                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST")
+//                        .requestMatchers(HttpMethod.POST, "/api/works").hasAnyRole("ADMIN", "ARTIST")
+//                        .requestMatchers(HttpMethod.PUT, "/api/works/{id}").hasAnyRole("ADMIN", "ARTIST")
 //                        .requestMatchers(HttpMethod.GET, "/api/works").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/works").hasAnyRole("ADMIN", "USER")
 //                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+//                        .anyRequest().authenticated()  // Require authentication for all other requests
                         .anyRequest().permitAll()
                 )
                 .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class)

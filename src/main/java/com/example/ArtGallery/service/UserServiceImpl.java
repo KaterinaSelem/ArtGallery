@@ -79,8 +79,13 @@ public class UserServiceImpl implements UserService {
                     existingUser.setName(userDTO.getName());
                     existingUser.setEmail(userDTO.getEmail());
                     existingUser.setPassword(userDTO.getPassword());
-                    Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
-                    existingUser.setUserRole(role);
+
+                    // Обновляем роли
+                    Set<Role> roles = userDTO.getRoles().stream()
+                            .map(roleDTO -> roleRepository.findById(roleDTO.getId()).orElse(null))
+                            .collect(Collectors.toSet());
+                    existingUser.setRoles(roles);
+
                     existingUser.setBornCity(userDTO.getBornCity());
                     existingUser.setLiveCity(userDTO.getLiveCity());
                     existingUser.setDescription(userDTO.getDescription());
@@ -101,10 +106,9 @@ public class UserServiceImpl implements UserService {
                             user.getName(),
                             user.getEmail(),
                             user.getPassword(),
-                            new RoleDTO(
-                                    user.getUserRole().getId(),
-                                    user.getUserRole().getTitle()
-                            )
+                            user.getRoles().stream()
+                                    .map(role -> new RoleDTO(role.getId(), role.getTitle()))
+                                    .collect(Collectors.toSet())
                     );
                 })
                 .orElse(null);
@@ -153,11 +157,14 @@ public class UserServiceImpl implements UserService {
         userDTO.setDescription(user.getDescription());
         userDTO.setImage(user.getImage());
 
-        if (user.getUserRole() != null) {
-            userDTO.setUserRole(new RoleDTO(user.getUserRole().getId(), user.getUserRole().getTitle()));
+        if (user.getRoles() != null) {
+            userDTO.setRoles(user.getRoles().stream()
+                    .map(role -> new RoleDTO(role.getId(), role.getTitle()))
+                    .collect(Collectors.toSet()));
         }
         return userDTO;
     }
+
 
     private User convertToEntity(UserDTO userDTO) {
         User user = new User();
@@ -171,12 +178,15 @@ public class UserServiceImpl implements UserService {
         user.setDescription(userDTO.getDescription());
         user.setImage(userDTO.getImage());
 
-        if (userDTO.getUserRole() != null) {
-            Role role = roleRepository.findById(userDTO.getUserRole().getId()).orElse(null);
-            user.setUserRole(role);
+        if (userDTO.getRoles() != null) {
+            Set<Role> roles = userDTO.getRoles().stream()
+                    .map(roleDTO -> roleRepository.findById(roleDTO.getId()).orElse(null))
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
         }
         return user;
     }
+
 
 //      Recover 04.08 15:32
 //    @Override
@@ -192,6 +202,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(RegisterDTO registerDTO) {
+
+        if (repository.existsByEmail(registerDTO.getEmail())) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
         Role selectedRole = roleService.getRoleById(registerDTO.getRoleId());
 
         User newUser = new User();
@@ -205,22 +220,6 @@ public class UserServiceImpl implements UserService {
         emailService.sendConfirmationEmail(newUser);
     }
 
-    //    @Transactional
-//    public boolean activateUser(String code) {
-//        ConfirmationCode confirmationCode = confirmationService.getConfirmationCode(code);
-//
-//        if (confirmationCode == null || confirmationCode.getExpired().isBefore(LocalDateTime.now())) {
-//            return false; // Код не найден или истёк срок действия
-//        }
-//
-//        User user = confirmationCode.getUser();
-//        user.setActive(true);
-//        repository.save(user);
-//
-//        confirmationService.deleteConfirmationCode(confirmationCode); // Удаляем использованный код
-//
-//        return true;
-//    }
     @Transactional
     public boolean activateUser(String code) {
         // Получаем код подтверждения

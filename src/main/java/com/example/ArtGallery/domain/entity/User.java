@@ -1,8 +1,6 @@
 package com.example.ArtGallery.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,13 +13,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements UserDetails{
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,14 +46,8 @@ public class User implements UserDetails{
     @Column(name = "image")
     private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Role userRole;
-
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @JsonIgnore
-//    @JsonManagedReference
     private List<Work> works;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -69,9 +60,6 @@ public class User implements UserDetails{
 
     @Column(name = "active")
     private Boolean active;
-
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,17 +81,27 @@ public class User implements UserDetails{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(bornCity, user.bornCity) && Objects.equals(liveCity, user.liveCity) && Objects.equals(description, user.description) && Objects.equals(image, user.image) && Objects.equals(userRole, user.userRole) && Objects.equals(works, user.works) && Objects.equals(roles, user.roles) && Objects.equals(active, user.active);
+        return Objects.equals(id, user.id) &&
+                Objects.equals(name, user.name) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(bornCity, user.bornCity) &&
+                Objects.equals(liveCity, user.liveCity) &&
+                Objects.equals(description, user.description) &&
+                Objects.equals(image, user.image) &&
+                Objects.equals(works, user.works) &&
+                Objects.equals(roles, user.roles) &&
+                Objects.equals(active, user.active);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, password, bornCity, liveCity, description, image, userRole, works, roles, active);
+        return Objects.hash(id, name, email, password, bornCity, liveCity, description, image, works, roles, active);
     }
 
     @Override
     public String toString() {
-        return String.format("User: id -%d, email - %s, active - %s, role - %s",
+        return String.format("User: id - %d, email - %s, active - %s, roles - %s",
                 id, email, active ? "yes" : "no", roles == null ? "empty" : roles);
     }
 }
