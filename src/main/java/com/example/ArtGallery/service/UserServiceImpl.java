@@ -248,7 +248,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Активируем пользователя
-
+        
         user.setActive(true);
         repository.save(user);
 

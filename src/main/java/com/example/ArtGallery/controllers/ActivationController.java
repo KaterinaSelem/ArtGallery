@@ -19,9 +19,9 @@ public class ActivationController {
         boolean isActivated = userService.activateUser(code);
 
         if (isActivated) {
-            return "Пользователь успешно активирован!";
+            return "user successfully activated!";
         } else {
-            return "Неверный или истёкший код подтверждения!";
+            return "Invalid or expired confirmation code!";
         }
     }
 }
