@@ -1,6 +1,7 @@
 package com.example.ArtGallery.controllers;
 
 import com.example.ArtGallery.domain.DTO.WorkDTO;
+import com.example.ArtGallery.domain.DTO.WorkDisplayDTO;
 import com.example.ArtGallery.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ public class WorkController {
 
     @Autowired
     private WorkService workService;
+
 
     @GetMapping
     public ResponseEntity<List<WorkDTO>> getAllWorks() {
@@ -53,5 +55,11 @@ public class WorkController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/byCategory")
+    public ResponseEntity<List<WorkDisplayDTO>> getWorksByCategoryId(@RequestParam Long categoryId) {
+        List<WorkDisplayDTO> works = workService.getWorksByCategoryId(categoryId);
+        return new ResponseEntity<>(works, HttpStatus.OK);
     }
 }

@@ -2,6 +2,8 @@ package com.example.ArtGallery.service;
 
 
 import com.example.ArtGallery.domain.DTO.WorkDTO;
+import com.example.ArtGallery.domain.DTO.WorkDisplayDTO;
+import com.example.ArtGallery.domain.entity.Category;
 import com.example.ArtGallery.domain.entity.User;
 import com.example.ArtGallery.domain.entity.Work;
 import com.example.ArtGallery.repositories.UserRepository;
@@ -46,7 +48,11 @@ public class WorkService {
                 .map(existingWork -> {
                     existingWork.setTitle(workDTO.getTitle());
                     existingWork.setCreatedAt(workDTO.getCreatedAt());
-                    existingWork.setCategoryId(workDTO.getCategoryId());
+
+                    Category category = new Category();
+                    category.setId(workDTO.getCategoryId());
+                    existingWork.setCategory(category);
+
                     existingWork.setArtStyle(workDTO.getArtStyle());
                     existingWork.setComition(workDTO.isComition());
                     existingWork.setDescription(workDTO.getDescription());
@@ -71,12 +77,32 @@ public class WorkService {
                 .orElse(null);
     }
 
+    public List<WorkDisplayDTO> getWorksByCategoryId(Long categoryId) {
+        return workRepository.findByCategoryId(categoryId).stream()
+                .map(this::convertToDisplayDTO)
+                .collect(Collectors.toList());
+    }
+
+    private WorkDisplayDTO convertToDisplayDTO(Work work) {
+        WorkDisplayDTO workDisplayDTO = new WorkDisplayDTO();
+        workDisplayDTO.setTitle(work.getTitle());
+        workDisplayDTO.setCreatedAt(work.getCreatedAt());
+        workDisplayDTO.setDescription(work.getDescription());
+        workDisplayDTO.setImage(work.getImage());
+
+        if (work.getUser() != null) {
+            workDisplayDTO.setUserName(work.getUser().getName());
+        }
+        return workDisplayDTO;
+    }
+
+
     private WorkDTO convertToDTO(Work work) {
         WorkDTO workDTO = new WorkDTO();
         workDTO.setId(work.getId());
         workDTO.setTitle(work.getTitle());
         workDTO.setCreatedAt(work.getCreatedAt());
-        workDTO.setCategoryId(work.getCategoryId());
+        workDTO.setCategoryId(work.getCategory() != null ? work.getCategory().getId() : null);
         workDTO.setArtStyle(work.getArtStyle());
         workDTO.setComition(work.isComition());
         workDTO.setDescription(work.getDescription());
@@ -93,7 +119,11 @@ public class WorkService {
         work.setId(workDTO.getId());
         work.setTitle(workDTO.getTitle());
         work.setCreatedAt(workDTO.getCreatedAt());
-        work.setCategoryId(workDTO.getCategoryId());
+
+        Category category = new Category();
+        category.setId(workDTO.getCategoryId());
+        work.setCategory(category);
+
         work.setArtStyle(workDTO.getArtStyle());
         work.setComition(workDTO.isComition());
         work.setDescription(workDTO.getDescription());

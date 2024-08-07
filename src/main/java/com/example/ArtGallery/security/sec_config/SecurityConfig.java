@@ -39,10 +39,10 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x -> x
 
-//                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/register").permitAll() // Разрешить доступ к регистрации
-//                        .requestMatchers(HttpMethod.GET, "/activate").permitAll() // Разрешить доступ к активации
-//                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST")
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/register").permitAll() // Разрешить доступ к регистрации
+                        .requestMatchers(HttpMethod.GET, "/activate").permitAll() // Разрешить доступ к активации
+//                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST", "USER")
 //                        .requestMatchers(HttpMethod.POST, "/api/works").hasAnyRole("ADMIN", "ARTIST")
 //                        .requestMatchers(HttpMethod.PUT, "/api/works/{id}").hasAnyRole("ADMIN", "ARTIST")
 //                        .requestMatchers(HttpMethod.GET, "/api/works").permitAll()
