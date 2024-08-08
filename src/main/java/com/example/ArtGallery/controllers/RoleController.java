@@ -10,51 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/roles")
+@RequestMapping("/roles")
 public class RoleController {
 
     @Autowired
     private RoleServiceImpl roleService;
-
-//    @GetMapping
-//    public List<Role> getAllRoles() {
-//        return roleService.getAllRoles();
-//    }
-//
-//    @GetMapping("/{id}")
-//    public Optional<Role> getRoleById(@PathVariable Long id) {
-//        return roleService.getRoleById(id);
-//    }
-//
-//    @PostMapping
-//    public Role createRole(@RequestBody Role role) {
-//        return roleService.createRole(role);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public Role updateRole(@PathVariable Long id, @RequestBody Role roleDetails) {
-//        return roleService.updateRole(id, roleDetails);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void deleteRole(@PathVariable Long id) {
-//        roleService.deleteRole(id);
-//    }
 
     @GetMapping
     public ResponseEntity<List<RoleDTO>> getAllRoles() {
         List<RoleDTO> roles = roleService.getAllRoles();
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<RoleDTO> getRoleById(@PathVariable Long id) {
-//        RoleDTO role = roleService.getRoleById(id);
-//        if (role != null) {
-//            return new ResponseEntity<>(role, HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
 
     @PostMapping
     public ResponseEntity<RoleDTO> createRole(@RequestBody RoleDTO roleDTO) {

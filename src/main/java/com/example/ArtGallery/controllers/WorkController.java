@@ -6,12 +6,14 @@ import com.example.ArtGallery.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/works")
+@RequestMapping("/works")
 public class WorkController {
 
     @Autowired
@@ -35,27 +37,40 @@ public class WorkController {
 
     @PostMapping
     public ResponseEntity<WorkDTO> createWork(@RequestBody WorkDTO workDTO) {
-        WorkDTO createdWork = workService.createWork(workDTO);
+        // Получаем email текущего пользователя из токена
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        // Передаем email текущего пользователя в сервис для получения userId
+        WorkDTO createdWork = workService.createWork(workDTO, currentUserEmail);
         return new ResponseEntity<>(createdWork, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<WorkDTO> updateWork(@PathVariable Long id, @RequestBody WorkDTO workDTO) {
-        WorkDTO updatedWork = workService.updateWork(id, workDTO);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        WorkDTO updatedWork = workService.updateWork(id, workDTO, currentUserEmail);
         if (updatedWork != null) {
             return new ResponseEntity<>(updatedWork, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Если пользователь не является владельцем
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWork(@PathVariable Long id) {
-        WorkDTO deletedWork = workService.deleteWork(id);
-        if (deletedWork != null) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        boolean isDeleted = workService.deleteWork(id, currentUserEmail);
+        if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Если пользователь не является владельцем
     }
+
+
 
     @GetMapping("/byCategory")
     public ResponseEntity<List<WorkDisplayDTO>> getWorksByCategoryId(@RequestParam Long categoryId) {

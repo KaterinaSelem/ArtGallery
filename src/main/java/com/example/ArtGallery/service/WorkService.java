@@ -10,6 +10,7 @@ import com.example.ArtGallery.repositories.UserRepository;
 import com.example.ArtGallery.repositories.WorkRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,44 +38,56 @@ public class WorkService {
                 .orElse(null);
     }
 
-    public WorkDTO createWork(WorkDTO workDTO) {
+    public WorkDTO createWork(WorkDTO workDTO, String currentUserEmail) {
+        // Получаем userId текущего пользователя
+        User user = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Устанавливаем userId в WorkDTO
+        workDTO.setUserId(user.getId());
+
+        // Сохраняем работу
         Work work = convertToEntity(workDTO);
         Work savedWork = workRepository.save(work);
+
         return convertToDTO(savedWork);
     }
 
-    public WorkDTO updateWork(Long id, WorkDTO workDTO) {
-        return workRepository.findById(id)
-                .map(existingWork -> {
-                    existingWork.setTitle(workDTO.getTitle());
-                    existingWork.setCreatedAt(workDTO.getCreatedAt());
+    public WorkDTO updateWork(Long id, WorkDTO workDTO, String currentUserEmail) {
+        Optional<Work> workOpt = workRepository.findById(id);
+        if (workOpt.isPresent()) {
+            Work existingWork = workOpt.get();
+            if (existingWork.getUser().getEmail().equals(currentUserEmail)) {
+                existingWork.setTitle(workDTO.getTitle());
+                existingWork.setCreatedAt(workDTO.getCreatedAt());
 
-                    Category category = new Category();
-                    category.setId(workDTO.getCategoryId());
-                    existingWork.setCategory(category);
+                Category category = new Category();
+                category.setId(workDTO.getCategoryId());
+                existingWork.setCategory(category);
 
-                    existingWork.setArtStyle(workDTO.getArtStyle());
-                    existingWork.setComition(workDTO.isComition());
-                    existingWork.setDescription(workDTO.getDescription());
-                    existingWork.setImage(workDTO.getImage());
+                existingWork.setArtStyle(workDTO.getArtStyle());
+                existingWork.setComition(workDTO.isComition());
+                existingWork.setDescription(workDTO.getDescription());
+                existingWork.setImage(workDTO.getImage());
 
-                    User user = userRepository.findById(workDTO.getUserId()).orElse(null);
-                    existingWork.setUser(user);
-
-                    Work updatedWork = workRepository.save(existingWork);
-                    return convertToDTO(updatedWork);
-                })
-                .orElse(null);
+                Work updatedWork = workRepository.save(existingWork);
+                return convertToDTO(updatedWork);
+            }
+        }
+        return null; // Если работа не найдена или пользователь не является владельцем
     }
 
     @Transactional
-    public WorkDTO deleteWork(Long id) {
-        return workRepository.findById(id)
-                .map(work -> {
-                    workRepository.deleteById(id);
-                    return convertToDTO(work);
-                })
-                .orElse(null);
+    public boolean deleteWork(Long id, String currentUserEmail) {
+        Optional<Work> workOpt = workRepository.findById(id);
+        if (workOpt.isPresent()) {
+            Work work = workOpt.get();
+            if (work.getUser().getEmail().equals(currentUserEmail)) {
+                workRepository.deleteById(id);
+                return true;
+            }
+        }
+        return false; // Если работа не найдена или пользователь не является владельцем
     }
 
     public List<WorkDisplayDTO> getWorksByCategoryId(Long categoryId) {
@@ -95,7 +108,6 @@ public class WorkService {
         }
         return workDisplayDTO;
     }
-
 
     private WorkDTO convertToDTO(Work work) {
         WorkDTO workDTO = new WorkDTO();
@@ -129,6 +141,7 @@ public class WorkService {
         work.setDescription(workDTO.getDescription());
         work.setImage(workDTO.getImage());
 
+        // Не устанавливаем пользователя при создании работы, если он не указан
         if (workDTO.getUserId() != null) {
             User user = userRepository.findById(workDTO.getUserId()).orElse(null);
             work.setUser(user);

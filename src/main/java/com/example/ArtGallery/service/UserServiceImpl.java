@@ -1,9 +1,6 @@
 package com.example.ArtGallery.service;
 
-import com.example.ArtGallery.domain.DTO.RegisterDTO;
-import com.example.ArtGallery.domain.DTO.RoleDTO;
-import com.example.ArtGallery.domain.DTO.UserDTO;
-import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
+import com.example.ArtGallery.domain.DTO.*;
 import com.example.ArtGallery.domain.entity.ConfirmationCode;
 import com.example.ArtGallery.domain.entity.Role;
 import com.example.ArtGallery.domain.entity.User;
@@ -96,6 +93,34 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
+    public boolean updateUserSelf(Long id, UserUpdateDTO userUpdateDTO) {
+        return repository.findById(id)
+                .map(existingUser -> {
+                    if (userUpdateDTO.getName() != null) {
+                        existingUser.setName(userUpdateDTO.getName());
+                    }
+                    if (userUpdateDTO.getPassword() != null) {
+                        existingUser.setPassword(encoder.encode(userUpdateDTO.getPassword()));
+                    }
+                    if (userUpdateDTO.getBornCity() != null) {
+                        existingUser.setBornCity(userUpdateDTO.getBornCity());
+                    }
+                    if (userUpdateDTO.getLiveCity() != null) {
+                        existingUser.setLiveCity(userUpdateDTO.getLiveCity());
+                    }
+                    if (userUpdateDTO.getDescription() != null) {
+                        existingUser.setDescription(userUpdateDTO.getDescription());
+                    }
+                    if (userUpdateDTO.getImage() != null) {
+                        existingUser.setImage(userUpdateDTO.getImage());
+                    }
+
+                    repository.save(existingUser);
+                    return true; // Обновление успешно
+                })
+                .orElse(false); // Пользователь не найден
+    }
+
     @Transactional
     public UserDeleteDTO deleteUser(Long id) {
         return repository.findById(id)
@@ -114,22 +139,6 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
-//    public UserDTO registerUser(RegisterDTO registerDTO) {
-//        // Получаем роль по идентификатору
-//        Role selectedRole = roleRepository.findById(registerDTO.getRoleId())
-//                .orElseThrow(() -> new RuntimeException("Role not found"));
-//
-//        // Создаем нового пользователя и присваиваем ему выбранную роль
-//        User newUser = new User();
-//        newUser.setName(registerDTO.getName());
-//        newUser.setEmail(registerDTO.getEmail());
-//        newUser.setPassword(registerDTO.getPassword());
-//        newUser.setUserRole(selectedRole);
-//
-//        // Сохраняем пользователя в базе данных
-//        User savedUser = repository.save(newUser);
-//        return convertToDTO(savedUser);
-//    }
 
     public UserDTO updateUserFields(Long id, UserDTO userDTO) {
         return repository.findById(id)
@@ -255,6 +264,12 @@ public class UserServiceImpl implements UserService {
         confirmationService.deleteConfirmationCode(confirmationCode);
 
         return true;
+    }
+
+    public UserDTO getUserByEmail(String email) {
+        return repository.findByEmail(email)
+                .map(this::convertToDTO)
+                .orElse(null);
     }
 
 }

@@ -38,17 +38,20 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x -> x
-
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/register").permitAll() // Разрешить доступ к регистрации
-                        .requestMatchers(HttpMethod.GET, "/activate").permitAll() // Разрешить доступ к активации
-//                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/updateFields").hasAnyRole("ADMIN", "ARTIST", "USER")
-//                        .requestMatchers(HttpMethod.POST, "/api/works").hasAnyRole("ADMIN", "ARTIST")
-//                        .requestMatchers(HttpMethod.PUT, "/api/works/{id}").hasAnyRole("ADMIN", "ARTIST")
-//                        .requestMatchers(HttpMethod.GET, "/api/works").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-//                        .anyRequest().authenticated()  // Require authentication for all other requests
-                        .anyRequest().permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/register").permitAll() // Разрешить доступ к регистрации
+                                .requestMatchers(HttpMethod.GET, "/activate").permitAll() // Разрешить доступ к активации
+                                .requestMatchers(HttpMethod.PUT, "/users/{id}/updateFields").hasAnyAuthority("ADMIN", "ARTIST")
+                                .requestMatchers(HttpMethod.POST, "/works").hasAnyAuthority("ADMIN", "ARTIST")
+                                .requestMatchers(HttpMethod.PUT, "/users").hasAnyAuthority("ADMIN", "ARTIST")
+                                .requestMatchers(HttpMethod.GET, "/works").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/works").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/works/byCategory/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/users/{id}/self").hasAnyAuthority("ADMIN", "ARTIST")
+                                .anyRequest().authenticated()
+//                        .anyRequest().permitAll()
                 )
                 .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();

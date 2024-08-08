@@ -1,23 +1,22 @@
 package com.example.ArtGallery.controllers;
 
-import com.example.ArtGallery.domain.DTO.RegisterDTO;
-import com.example.ArtGallery.domain.DTO.UserDTO;
-import com.example.ArtGallery.domain.DTO.UserDeleteDTO;
+import com.example.ArtGallery.domain.DTO.*;
 import com.example.ArtGallery.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
-
 
 
     @GetMapping
@@ -50,24 +49,41 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @PutMapping("/{id}/updateUserAdmin")
+    public ResponseEntity<String> updateUserSelf(@PathVariable Long id, @RequestBody UserUpdateDTO userUpdateDTO) {
+        boolean isUpdated = userService.updateUserSelf(id, userUpdateDTO);
+        if (isUpdated) {
+            return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
+
+
+    @PutMapping("/updateUser")
+    public ResponseEntity<String> updateUserSelf(@RequestBody UserUpdateDTO userUpdateDTO) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName(); // Email из токена
+
+        UserDTO currentUser = userService.getUserByEmail(currentUserEmail);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        boolean isUpdated = userService.updateUserSelf(currentUser.getId(), userUpdateDTO);
+        if (isUpdated) {
+            return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("Failed to update user", HttpStatus.BAD_REQUEST);
+    }
+
+
     @DeleteMapping("/{id}")
     public UserDeleteDTO deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
-
-
-
-//    @PostMapping("/register")
-//    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
-//        UserDTO createdUser = userService.registerUser(userDTO);
-//        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-//    }
-
-//    @PostMapping("/register")
-//    public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterDTO registerDTO) {
-//        UserDTO createdUser = userService.registerUser(registerDTO);
-//        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-//    }
 
     @PutMapping("/{id}/updateFields")
     public ResponseEntity<UserDTO> updateUserFields(@PathVariable Long id, @RequestBody UserDTO userDTO) {
@@ -76,6 +92,32 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDTO> getUserProfile() {
+
+        // Получаем email текущего пользователя из токена
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+
+        // Ищем пользователя по email
+        UserDTO currentUser = userService.getUserByEmail(currentUserEmail);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Преобразуем UserDTO в UserProfileDTO
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        userProfileDTO.setName(currentUser.getName());
+        userProfileDTO.setBornCity(currentUser.getBornCity());
+        userProfileDTO.setLiveCity(currentUser.getLiveCity());
+        userProfileDTO.setDescription(currentUser.getDescription());
+        userProfileDTO.setImage(currentUser.getImage());
+
+        // Возвращаем профиль пользователя
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
     }
 
 }

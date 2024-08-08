@@ -60,7 +60,7 @@ public class EmailServiceImpl implements EmailService {
             String code = confirmationService.generateConfirmationCode(user);
 
             //EXAMPLE:  GET -> http://localhost:8080/register?code=fsf787fs-fsfvsdff-rwdfsf
-            String url = "http://localhost:8080/activate?code=" + code;
+            String url = "http://localhost:8080/api/activate?code=" + code;
 
             // name -> Alex
             // link -> http://localhost:8080/...
