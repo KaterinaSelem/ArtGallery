@@ -14,8 +14,8 @@ public class ScheduledTasks {
     }
 
     // Планировщик, запускающийся каждый день в полночь
-    @Scheduled(cron = "0 */2 * * * ?")
-    public void cleanUpExpiredConfirmationCodes() {
-        confirmationService.removeExpiredConfirmationCodesAndUsers();
-    }
+//    @Scheduled(cron = "0 */2 * * * ?")
+//    public void cleanUpExpiredConfirmationCodes() {
+//        confirmationService.removeExpiredConfirmationCodesAndUsers();
+//    }
 }

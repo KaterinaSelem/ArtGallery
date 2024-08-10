@@ -50,8 +50,9 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/works/byCategory/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/users/{id}/self").hasAnyAuthority("ADMIN", "ARTIST")
-                                .anyRequest().authenticated()
-//                        .anyRequest().permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user-roles/**").permitAll()
+//                                .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterAfter(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
