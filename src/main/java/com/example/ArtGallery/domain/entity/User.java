@@ -34,10 +34,10 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "bornCity")
+    @Column(name = "\"bornCity\"")
     private String bornCity;
 
-    @Column(name = "liveCity")
+    @Column(name = "\"liveCity\"")
     private String liveCity;
 
     @Column(name = "description")
