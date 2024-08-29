@@ -34,6 +34,11 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping ("/artists")
+    public List<UserArtistDTO> getAllUserArtists() {
+        return userService.getAllUserArtists();
+    }
+
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         UserDTO createdUser = userService.createUser(userDTO);

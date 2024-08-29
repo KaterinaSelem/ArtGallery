@@ -58,6 +58,32 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    // метод для вывода всех UserArtist и так же преобазование  convertToUserArtistDTO
+    public List<UserArtistDTO> getAllUserArtists() {
+        return repository.findAll().stream()
+                .filter(this::hasArtistRole) // Фильтрация по наличию роли ARTIST
+                .map(this::convertToUserArtistDTO)
+                .collect(Collectors.toList());
+    }
+
+    private boolean hasArtistRole(User user) {
+        // Проверка наличия роли ARTIST среди ролей пользователя
+        return user.getRoles().stream()
+                .anyMatch(role -> role.getTitle().equalsIgnoreCase("ARTIST"));
+    }
+
+    private UserArtistDTO convertToUserArtistDTO(User user) {
+        return new UserArtistDTO(
+                user.getName(),
+                user.getBornCity(),
+                user.getLiveCity(),
+                user.getDescription(),
+                user.getImage(),
+                user.getEmail()
+        );
+    }
+
+
     public UserDTO getUserById(Long id) {
         return repository.findById(id)
                 .map(this::convertToDTO)
@@ -196,18 +222,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-
-//      Recover 04.08 15:32
-//    @Override
-//    public void register(User user) {
-//        user.setId(null);
-//        user.setPassword(encoder.encode(user.getPassword()));
-//        user.setActive(false);
-//        user.setRoles(Set.of(roleService.getRoleUser()));
-//
-//        repository.save(user);
-//        emailService.sendConfirmationEmail(user);
-//    }
 
     @Override
     public void register(RegisterDTO registerDTO) {

@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/users/{id}/self").hasAnyAuthority("ADMIN", "ARTIST")
                                 .requestMatchers(HttpMethod.GET, "/works/byCategory/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users/artists").permitAll()
 //                                .anyRequest().authenticated()
                         .anyRequest().permitAll()
                 )
