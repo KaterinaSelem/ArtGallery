@@ -74,6 +74,7 @@ public class UserServiceImpl implements UserService {
 
     private UserArtistDTO convertToUserArtistDTO(User user) {
         return new UserArtistDTO(
+                user.getId(),
                 user.getName(),
                 user.getBornCity(),
                 user.getLiveCity(),

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserArtistDTO {
+
+    private Long id;
     private String name;
     private String bornCity;
     private String liveCity;
