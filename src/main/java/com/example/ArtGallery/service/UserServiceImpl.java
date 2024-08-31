@@ -10,6 +10,7 @@ import com.example.ArtGallery.service.interfaces.EmailService;
 import com.example.ArtGallery.service.interfaces.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -66,10 +67,27 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+
+//-----------------------------------------------------------------------------------------
+//// методы для ARTISTS
+
+    // выводит всех ARTISTS
     private boolean hasArtistRole(User user) {
         // Проверка наличия роли ARTIST среди ролей пользователя
         return user.getRoles().stream()
                 .anyMatch(role -> role.getTitle().equalsIgnoreCase("ARTIST"));
+    }
+
+    // выводит ARTISTS по id
+    public UserArtistDTO getUserArtistById(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Artist not found with id: " + id));
+
+        if (!hasArtistRole(user)) {
+            throw new AccessDeniedException("User does not have ARTIST role");
+        }
+
+        return convertToUserArtistDTO(user);
     }
 
     private UserArtistDTO convertToUserArtistDTO(User user) {
@@ -83,7 +101,7 @@ public class UserServiceImpl implements UserService {
                 user.getEmail()
         );
     }
-
+//----------------------------------------------------------------------------------
 
     public UserDTO getUserById(Long id) {
         return repository.findById(id)

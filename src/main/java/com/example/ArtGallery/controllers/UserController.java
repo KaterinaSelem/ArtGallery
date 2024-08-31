@@ -39,6 +39,12 @@ public class UserController {
         return userService.getAllUserArtists();
     }
 
+    @GetMapping("/artists/{id}")
+    public UserArtistDTO getUserArtistById(@PathVariable Long id) {
+        return userService.getUserArtistById(id);
+    }
+
+
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         UserDTO createdUser = userService.createUser(userDTO);
