@@ -15,10 +15,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,6 +71,25 @@ public class UserServiceImpl implements UserService {
                 .filter(this::hasArtistRole) // Фильтрация по наличию роли ARTIST
                 .map(this::convertToUserArtistDTO)
                 .collect(Collectors.toList());
+    }
+
+//-----------------------------------------------------------------------------------------
+    //// метод для uploadUserImage
+
+    public String uploadUserImage(String email, MultipartFile file) throws IOException {
+        User user = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get("uploads/" + fileName);
+        Files.createDirectories(filePath.getParent());
+        Files.write(filePath, file.getBytes());
+
+        String imageUrl = "/uploads/" + fileName;
+        user.setImage(imageUrl);
+        repository.save(user);
+
+        return imageUrl;
     }
 
 

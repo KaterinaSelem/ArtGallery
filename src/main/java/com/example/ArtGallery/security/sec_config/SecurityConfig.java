@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/works/byCategory/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users/artists").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/categories").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/uploadImageUser").hasAnyAuthority("ADMIN", "ARTIST")
 //                                .anyRequest().authenticated()
                         .anyRequest().permitAll()
                 )

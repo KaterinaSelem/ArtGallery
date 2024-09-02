@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -70,6 +72,60 @@ public class UserController {
     }
 
 
+    @PutMapping("/updateUserImage")
+    public ResponseEntity<String> updateUserAndUploadImage(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "liveCity", required = false) String liveCity,
+            @RequestParam(value = "bornCity", required = false) String bornCity,
+            @RequestParam(value = "name", required = false) String name) {
+
+        // Получаем текущего пользователя из контекста безопасности
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName(); // Email из токена
+
+        // Ищем пользователя по email
+        UserDTO currentUser = userService.getUserByEmail(currentUserEmail);
+        if (currentUser == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        // Флаг, указывающий, были ли обновлены текстовые данные
+        boolean isTextUpdated = false;
+
+        // Обновляем текстовые данные пользователя, если предоставлены новые данные
+        if (description != null || liveCity != null || bornCity != null || name != null) {
+            if (description != null) currentUser.setDescription(description);
+            if (liveCity != null) currentUser.setLiveCity(liveCity);
+            if (bornCity != null) currentUser.setBornCity(bornCity);
+            if (name != null) currentUser.setName(name);
+
+            // Сохраняем обновления в базе данных
+            userService.updateUser(currentUser.getId(), currentUser);
+            isTextUpdated = true;
+        }
+
+        // Если есть файл изображения, загружаем его
+        if (file != null && !file.isEmpty()) {
+            try {
+                String imageUrl = userService.uploadUserImage(currentUser.getEmail(), file);
+                // Обновляем URL изображения в данных пользователя
+                currentUser.setImage(imageUrl);
+                userService.updateUser(currentUser.getId(), currentUser);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+            }
+        }
+
+        if (isTextUpdated || file != null) {
+            return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("No updates were provided", HttpStatus.OK);
+        }
+    }
+
+
     @PutMapping("/updateUser")
     public ResponseEntity<String> updateUserSelf(@RequestBody UserUpdateDTO userUpdateDTO) {
 
@@ -90,7 +146,6 @@ public class UserController {
         return new ResponseEntity<>("Failed to update user", HttpStatus.BAD_REQUEST);
     }
 
-
     @DeleteMapping("/{id}")
     public UserDeleteDTO deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
@@ -104,6 +159,7 @@ public class UserController {
         }
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
+
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDTO> getUserProfile() {
