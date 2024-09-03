@@ -37,11 +37,12 @@
                 <constraints nullable="true"/>
             </column>
 
-
-
         </createTable>
 
+    </changeSet>
 
+    <changeSet id="alter-description-column-type" author="Alexey">
+        <modifyDataType tableName="users" columnName="description" newDataType="text"/>
     </changeSet>
 
 </databaseChangeLog>
