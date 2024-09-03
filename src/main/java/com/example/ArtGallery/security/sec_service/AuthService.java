@@ -7,6 +7,7 @@ import com.example.ArtGallery.service.UserServiceImpl;
 import com.example.ArtGallery.service.interfaces.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,18 +29,26 @@ public class AuthService {
         this.refreshStorage = new HashMap<>();
     }
 
-    public TokenResponseDto login(User inboundUser) throws AuthException {
+    public TokenResponseDto login(User inboundUser) {
         String username = inboundUser.getUsername();
-        User foundUser = (User) userService.loadUserByUsername(username);
+        User foundUser;
 
-        if (passwordEncoder.matches(inboundUser.getPassword(), foundUser.getPassword())) {
-            String accessToken = tokenService.generateAccessToken(foundUser);
-            String refreshToken = tokenService.generateRefreshToken(foundUser);
-            refreshStorage.put(username, refreshToken);
-            return new TokenResponseDto(accessToken, refreshToken);
-        } else {
-            throw new AuthException("Password is incorrect");
+        try {
+            foundUser = (User) userService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            // Возвращаем null или выбрасываем исключение, если пользователь не найден
+            return new TokenResponseDto(null, null);
         }
+
+        if (foundUser == null || !passwordEncoder.matches(inboundUser.getPassword(), foundUser.getPassword())) {
+            // Возвращаем null или выбрасываем исключение, если пароль неверный
+            return new TokenResponseDto(null, null);
+        }
+
+        String accessToken = tokenService.generateAccessToken(foundUser);
+        String refreshToken = tokenService.generateRefreshToken(foundUser);
+        refreshStorage.put(username, refreshToken);
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 
     public TokenResponseDto getNewAccessToken(String inboundRefreshToken) {
