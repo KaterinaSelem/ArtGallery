@@ -76,19 +76,48 @@ public class UserServiceImpl implements UserService {
 //-----------------------------------------------------------------------------------------
     //// метод для uploadUserImage
 
+    //    public String uploadUserImage(String email, MultipartFile file) throws IOException {
+//        User user = repository.findByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+//        Path filePath = Paths.get("uploads/" + fileName);
+//        Files.createDirectories(filePath.getParent());
+//        Files.write(filePath, file.getBytes());
+//
+//        String imageUrl = "/uploads/" + fileName;
+//        user.setImage(imageUrl);
+//        repository.save(user);
+//
+//        return imageUrl;
+//    }
     public String uploadUserImage(String email, MultipartFile file) throws IOException {
+        // Находим пользователя по email
         User user = repository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Генерируем уникальное имя файла
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get("uploads/" + fileName);
+
+        // Указываем полный путь к папке uploads на вашем сервере
+        // Например, D:/Java_Project/artgallery/everydayAG/public/uploads/
+        String uploadDir = "D:/Java_Project/artgallery/everydayAG/public/uploads/"; // Задайте свой абсолютный путь
+
+        // Объединяем папку и имя файла для создания полного пути
+        Path filePath = Paths.get(uploadDir + fileName);
+
+        // Создаём директории, если они не существуют
         Files.createDirectories(filePath.getParent());
+
+        // Сохраняем файл по указанному пути
         Files.write(filePath, file.getBytes());
 
-        String imageUrl = "/uploads/" + fileName;
+        // Сохраняем полный путь в базе данных
+        String imageUrl = filePath.toString();
         user.setImage(imageUrl);
         repository.save(user);
 
+        // Возвращаем полный путь
         return imageUrl;
     }
 
@@ -314,7 +343,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Активируем пользователя
-        
+
         user.setActive(true);
         repository.save(user);
 
